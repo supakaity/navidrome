@@ -223,7 +223,7 @@ func (r *playlistRepository) refreshSmartPlaylist(pls *model.Playlist) bool {
 		From("media_file").LeftJoin("annotation on (" +
 		"annotation.item_id = media_file.id" +
 		" AND annotation.item_type = 'media_file'" +
-		" AND annotation.user_id = '" + userId(r.ctx) + "')").
+		" AND annotation.user_id = '" + pls.OwnerID + "')").
 		LeftJoin("media_file_genres ag on media_file.id = ag.media_file_id").
 		LeftJoin("genre on ag.genre_id = genre.id").GroupBy("media_file.id")
 	sq = r.addCriteria(sq, rules)

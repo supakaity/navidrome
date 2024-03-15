@@ -125,6 +125,15 @@ func (s *playlists) parseNSP(ctx context.Context, pls *model.Playlist, file io.R
 	if nsp.Comment != "" {
 		pls.Comment = nsp.Comment
 	}
+	if nsp.Username != "" {
+		owner, err := s.ds.User(ctx).FindByUsername(nsp.Username)
+		if err != nil {
+			log.Error(ctx, "Error finding playlist owner by username", "username", nsp.Username, err)
+			return nil, err
+		}
+		pls.OwnerName = owner.Name
+		pls.OwnerID = owner.ID
+	}
 	return pls, nil
 }
 
@@ -274,6 +283,7 @@ type nspFile struct {
 	criteria.Criteria
 	Name    string `json:"name"`
 	Comment string `json:"comment"`
+	Username string `json:"username"`
 }
 
 func (i *nspFile) UnmarshalJSON(data []byte) error {
@@ -284,5 +294,6 @@ func (i *nspFile) UnmarshalJSON(data []byte) error {
 	}
 	i.Name, _ = m["name"].(string)
 	i.Comment, _ = m["comment"].(string)
+	i.Username, _ = m["username"].(string)
 	return json.Unmarshal(data, &i.Criteria)
 }
